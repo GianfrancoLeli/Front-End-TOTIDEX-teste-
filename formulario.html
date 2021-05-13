@@ -1,0 +1,154 @@
+<!DOCTYPE html lang="pt-br">
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="css/estilo_formulario.css">
+        <title>Formulário de Novo Aluno</title>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <h1>TOTIDex</h1>
+            </header>
+            <main>
+                <h2>Formulário para Cadastro de Novo Toter</h2>
+                <div>
+                    <a href="index.html"><img class="icone_casa" src="imagens/home.png" alt=""></a>
+                    <p>Inicio</p>
+
+                    <form action="">
+                        <label for="turma">Turma:</label>
+                        <input class="turma" name="turma" maxlength="50">
+                        <br>
+                        <label for="nome">Nome: </label>
+                        <input class="nome" type="text" name="nome" maxlength="50">
+                        <br>
+                        <label for="sobre">Sobrenome: </label>
+                        <input class="sobrenome" type="text" name="sobrenome" maxlength="50">
+                        <br>
+                        <label for="idade">Idade: </label>
+                        <input class="idade" name="idade" maxlength="2">
+                        <br>
+                        <input class="confirmarBtn" type="submit" value="Confirmar">
+                        <a href="index.html"><input class="cancelarBtn" type="button" value="Cancelar"></a>
+                    </form>
+                </div>
+            </main>
+        </div>
+        <script>
+
+            //Variáveis Globais - HTML
+            var campo_turma = document.querySelector("input.turma");
+            var campo_nome = document.querySelector("input.nome");
+            var campo_sobrenome = document.querySelector("input.sobrenome");
+            var campo_idade = document.querySelector("input.idade");
+            var botao_confirmar = document.querySelector("input.confirmarBtn");
+            var botao_cancelar = document.querySelector("input.cancelarBtn");
+
+            var idAcao = Number(localStorage.getItem("idAcao"));
+
+            
+            //Sequencia
+            var alunosSeq = Number(localStorage.getItem("alunosSeq"));
+            if(! alunosSeq ){
+                alunosSeq = 0;
+            }
+
+            //Objetos
+            var ListaAlunos = JSON.parse(localStorage.getItem("ListaAlunos"));
+            if(! ListaAlunos ){
+                ListaAlunos = {Alunos:[]};
+            }
+
+            //JSON
+            var myJSON;
+
+            //Funções
+            function apenasNumeros(e){
+                var tecla = String.fromCharCode(e.which);
+                var regex = /[0-9]/;
+                if(! (tecla.match(regex))){
+		            return false;
+	            }
+            }
+
+            function apenasChar(e) {
+                var tecla = String.fromCharCode(e.which);
+                var regex = /[a-zA-Z ]/;
+                if(! (tecla.match(regex))){
+		            return false;
+	            }
+            }
+
+
+            function verificaDados(event) {
+                campo_nome.value = campo_nome.value.trim();
+                if (campo_turma.value == "" || campo_nome.value == "" || campo_sobrenome.value == "" || campo_idade.value == "") {
+                    alert("Dados Inválidos! Tente Novamente.");
+                }
+                else{
+                    armazenarDados(event);
+                }
+            }
+
+            function armazenarDados(event) {
+                event.preventDefault();
+                //Adiciona ou modifica um aluno de ListaAlunos
+                if (idAcao == 0) {
+                    alunosSeq += 1;
+                    ListaAlunos.Alunos.push({turma: campo_turma.value, nome: campo_nome.value, sobrenome: campo_sobrenome.value, idade: campo_idade.value, id: alunosSeq});
+                }
+                else{
+                    ListaAlunos.Alunos.forEach(e => {
+                        if (e.id == idAcao){
+                            var indice = ListaAlunos.Alunos.indexOf(e);
+                            ListaAlunos.Alunos.splice(indice, 1, {turma: campo_turma.value, nome: campo_nome.value, sobrenome: campo_sobrenome.value, idade: campo_idade.value, id: idAcao});
+                        }
+                    });
+                }
+                myJSON = JSON.stringify(ListaAlunos);
+                localStorage.setItem("ListaAlunos", myJSON);
+                localStorage.setItem("alunosSeq", alunosSeq);
+                window.location.assign("index.html");
+            }
+
+            function preencheCamposEditar() {                
+                    if (idAcao != 0) {
+                        var valorTurma;
+                        var valorNome;
+                        var valorSobrenome;
+                        var valorIdade;
+                        ListaAlunos.Alunos.forEach(e => {
+                            if (e.id == idAcao){
+                                valorTurma = e.turma;
+                                valorNome = e.nome;
+                                valorSobrenome = e.sobrenome;
+                                valorIdade = e.idade;
+                            }
+                        });
+                        campo_turma.setAttribute("value", valorTurma);
+                        campo_nome.setAttribute("value", valorNome);
+                        campo_sobrenome.setAttribute("value", valorSobrenome);
+                        campo_idade.setAttribute("value", valorIdade);
+                }
+            }
+
+            //Rotina Principal
+
+            window.onload = preencheCamposEditar();
+
+            campo_idade.onkeypress = apenasNumeros;
+            campo_turma.onkeypress = apenasNumeros;
+            campo_nome.onkeypress = apenasChar;
+            campo_sobrenome.onkeypress = apenasChar;
+
+
+            botao_confirmar.addEventListener("click", verificaDados);
+            botao_cancelar.addEventListener("click", function(){
+                window.location.assign("index.html");
+            });
+            
+                
+        </script>
+    </body>
+</html>
