@@ -36,7 +36,11 @@ main div{
 
 main .icone_cadastro, img{
     cursor: pointer;
-    width: 20px;
+    width: 30px;
+}
+
+.logo{
+    width: 600px;
 }
 
 main p{
